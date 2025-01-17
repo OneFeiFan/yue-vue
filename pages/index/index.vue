@@ -1,5 +1,6 @@
 <template>
 	<view class="content">
+	<status-bar backgroundColor="#F7F7F7"/>
     <uni-nav-bar :border="false" leftWidth="50rpx" rightWidth="50rpx" class="nav">
       <view slot="left">
         <view class="nav-text" @click="showMenu = true">
@@ -23,7 +24,7 @@
         <view class="content-wrap"> 内容 {{tab.title}} </view>
       </y-tab>
     </y-tabs>
-    <hqs-popup v-model="showMenu" from="left" round="5" width="75vw">
+    <hqs-popup v-model="showMenu" from="left" :round="5" width="75vw">
       <view class="menu-content">
         <header class="menu-header menu-card">
 
@@ -64,7 +65,10 @@
       // 标签切换事件
       tabChange(index, item) {
         console.log("tabChange", index, item);
-      }
+      },
+	  confirm(){
+		  
+	  }
 		}
 	}
 </script>
@@ -123,27 +127,30 @@
     box-sizing: border-box;
     height: 100%;
     width: 100%;
-    padding: 20rpx;
+    //padding: 0 20rpx 20rpx;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
     .menu-header{
-      padding: 30% 50%;
-      border-radius: 10rpx;
+      height: 25%;
+      padding: 0 50%;
+      //border-radius: 10rpx;
     }
     .menu-mid{
-      padding: 55% 50%;
+      height: 42.5%;
+      padding: 0 47%;
       border-radius: 10rpx;
     }
     .menu-bottom{
-      padding: 35% 50%;
+      height: 30%;
+      padding: 0 47%;
       border-radius: 10rpx;
     }
   }
   .content-wrap{
     /* #ifndef H5 */
-    height: calc(100vh - 44px);
+    height: calc(100vh - 88px - var(--status-bar-height));
     /* #endif */
     /* #ifdef H5 */
     height: calc(100vh - 88px);
