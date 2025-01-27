@@ -1,5 +1,8 @@
 <script>
+import  NMP  from 'NeteaseCloudMusicApi'
+import NeteaseMusic from './model/NeteaseApi'
 export default {
+
   onThemeChange() {
     console.log('themeChange');
   },
@@ -7,7 +10,26 @@ export default {
     console.log('App Launch')
   },
   onShow: function () {
-    console.log('App Show')
+    console.log('App Show11111')
+    // console.log(user_detail)
+    // let {user_detail} = NMP
+    // console.log(user_detail, NMP)
+
+    // console.log(NeteaseMusic.getSongListDetail)
+    // NeteaseMusic.getSongListDetail('649445015').then(res => {
+    //   console.log(res)
+    // }).catch(err => {
+    //   console.log(err)
+    // })
+    NeteaseMusic.getSong([1696326,28546249]).then(res => {
+      console.log(res)
+    })
+    //https://music.163.com/playlist?id=649445015&uct2=U2FsdGVkX18KVsgNPym2ejqUgVhCxWRtC0lJcNORF9M=
+    // NMP.user_detail({uid:'32953014'}).then(res => {
+    //   console.log(res)
+    // }).catch(err => {
+    //   console.log(err)
+    // })
   },
   onHide: function () {
     console.log('App Hide')
