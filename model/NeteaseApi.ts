@@ -22,6 +22,7 @@ interface SongListDetail {
     cover: string;
     description: string;
 }
+
 interface NCMUser {
     id: string;
     name: string;
@@ -29,25 +30,24 @@ interface NCMUser {
 
 export default class NeteaseApi {
 
-private static async getSongListDetail(id: string): Promise<SongListDetail> {
-    try {
-        const res = await NCM.playlist_detail({id: id});
-        if (res.status === 200) {
-            const { id, name, coverImgUrl, description } = res.body.playlist as NCMSongList;
-            return {
-                "id": "NCM" + id,
-                "name": "网易云：" + name,
-                "cover": coverImgUrl,
-                "description": description || "",
-            };
-        } else {
-            throw new Error("Failed to get song list detail.");
+    private static async getSongListDetail(id: string): Promise<SongListDetail> {
+        try {
+            const res = await NCM.playlist_detail({id: id});
+            if (res.status === 200) {
+                const {id, name, coverImgUrl, description} = res.body.playlist as NCMSongList;
+                return {
+                    "id": "NCM" + id,
+                    "name": "网易云：" + name,
+                    "cover": coverImgUrl,
+                    "description": description || "",
+                };
+            } else {
+                throw new Error("Failed to get song list detail.");
+            }
+        } catch (err) {
+            throw new Error(`Error in getSongListDetail with id ${id}: ${err}`);
         }
-    } catch (err) {
-        throw new Error(`Error in getSongListDetail with id ${id}: ${err}`);
     }
-}
-
 
 
     private static async getSongListSongs(id: string): Promise<Array<string>> {
@@ -76,6 +76,7 @@ private static async getSongListDetail(id: string): Promise<SongListDetail> {
             throw new Error(`Error fetching song list with id ${id}\n${err}`);
         }
     }
+
     public static async getSong(id: Array<string>): Promise<Array<Song>> {
         if (id.length === 0) {
             throw new Error("No song IDs provided");
@@ -88,7 +89,7 @@ private static async getSongListDetail(id: string): Promise<SongListDetail> {
             }
             const songs: Array<SongDetail> = res.body.songs as Array<SongDetail>;
             const songsArray: Array<Song> = songs.map(song => {
-                const { id, name, ar, al, dt, publishTime } = song;
+                const {id, name, ar, al, dt, publishTime} = song;
                 const artistIds = ar.map(item => "NCM" + item.id);
                 const albumId = "NCM" + al.id;
                 return new Song(
@@ -104,9 +105,55 @@ private static async getSongListDetail(id: string): Promise<SongListDetail> {
                     '' // 歌词
                 );
             });
-            return songsArray||new Array<Song>();
+            return songsArray || new Array<Song>();
         } catch (err) {
             throw new Error(`Error fetching song details with IDs ${ids}\n${err}`);
+        }
+    }
+
+    public static async getSongUrl(id: string): Promise<string | null> {
+        let res;
+        //#ifdef H5
+        const answer = {status: 500, body: {}, cookie: []}
+        res = await new Promise((resolve, reject) => {
+            // @ts-ignore
+            uni.request({
+                url: `http://localhost:3000/song/download/url?id=${id}`,
+                method: 'GET',
+                responseType: 'arraybuffer',
+                // @ts-ignore
+                success: function (result) {
+                    const body = result.data
+                    answer.status = result.statusCode;
+                    const utf8decoder = new TextDecoder("utf-8");
+                    // @ts-ignore
+                    answer.body = JSON.parse(utf8decoder.decode(body));
+                    resolve(answer);
+                },
+                // @ts-ignore
+                fail: function (res) {
+                    reject(res);
+                }
+            });
+        });
+        //#endif
+        //#ifdef APP-PLUS
+        res = await NCM.song_download_url({id});
+        //#endif
+        try {
+            // @ts-ignore
+            if (res.status !== 200) {
+                throw new Error("Failed to get song URL.");
+            }
+            // @ts-ignore
+            let url: string = res.body.data.url as string;
+
+            if (url !== null && url !== '') {
+                return url;
+            }
+            return null;
+        } catch (err) {
+            throw new Error(`Error fetching song URL with ID ${id}\n${err}`);
         }
     }
 
