@@ -64,10 +64,11 @@ import YTabs from "@/uni_modules/y-tabs/components/y-tabs/y-tabs.vue";
 import StatusBar from "@/components/status-bar/status-bar.vue";
 import UniNavBar from "@/uni_modules/uni-nav-bar/components/uni-nav-bar/uni-nav-bar.vue";
 import SongList from "@/model/SongList";
+import UniIcons from "@/uni_modules/uni-icons/components/uni-icons/uni-icons.vue";
 
 
 export default {
-  components: {UniNavBar, StatusBar, YTabs},
+  components: {UniIcons, UniNavBar, StatusBar, YTabs},
   data() {
     return {
       title: 'Hello',
@@ -85,13 +86,16 @@ export default {
   onLoad() {
     // this.$yueService.getSongListByUrl("https://music.163.com/playlist?id=2854089226&uct2=U2FsdGVkX18ld4Rc3IO/DVyoxwj5X0E/0FsVh7scZe0=")
     const songListService = this.$yueService.getSongListService();
-    this.songList = songListService.getAllSongLists();
+    this.songList = songListService.getAllSongList();
     console.log(this.songList);
   },
-  onShow() {
-    const songListService = this.$yueService.getSongListService();
-    this.songList = songListService.getAllSongLists()
-    console.log(this.songList);
+  // onShow() {
+  //   const songListService = this.$yueService.getSongListService();
+  //   this.songList = songListService.getAllSongList()
+  //   console.log(this.songList);
+  // },
+  onHide() {
+    console.log('onHide');
   },
   methods: {
     clearInput() {
@@ -126,7 +130,23 @@ export default {
         success: (res)=> {
           if (res.confirm) {
             //https://music.163.com/playlist?id=2854089226&uct2=U2FsdGVkX1+mh9YDffLH+/Os8HjCfKfKZI2rBT9RXqA=
-            this.$yueService.getSongListByUrl(res.content);
+
+            uni.showLoading({
+              title: '加载中'
+            });
+            uni.showToast({
+              title: '添加成功',
+              icon: 'success'
+            });
+            this.$yueService.getSongListByUrl(res.content).then(res => {
+              uni.hideLoading();
+            }).catch(err => {
+              uni.hideLoading();
+              uni.showToast({
+                title: '加载失败',
+                icon: 'none'
+                });
+            });
             console.log('用户点击确定');
           } else if (res.cancel) {
             console.log('用户点击取消');

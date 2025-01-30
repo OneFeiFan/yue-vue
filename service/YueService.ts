@@ -44,7 +44,7 @@ export default class YueService {
                 let id: string = new URLSearchParams(url.search).get('id') as string;
                 let result = await NeteaseApi.getSongList(id);
                 this.songListService.addSongList(result);
-                CacheService.set('songList', result.toJson());
+                // CacheService.set('songList', result.toJson());
             }
         } catch (e) {
             console.log(e)
