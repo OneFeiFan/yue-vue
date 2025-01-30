@@ -5,10 +5,13 @@
     "description": "",
     "keywords": [],
     "dependencies": {
-        "NeteaseCloudMusicApi": "github:OneFeiFan/NeteaseCloudMusicApi"
+        "NeteaseCloudMusicApi": "github:OneFeiFan/NeteaseCloudMusicApi",
+        "url-search-params-polyfill": "^8.2.5"
     },
     "devDependencies": {
+        "@dcloudio/types": "^3.4.14",
         "@types/node": "^16.11.19",
+        "@uni-helper/uni-app-types": "^1.0.0-alpha.6",
         "eslint": "8.7.0"
     }
 }
