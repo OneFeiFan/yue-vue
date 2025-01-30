@@ -2,6 +2,10 @@ import SongService from './SongService';
 import AlbumService from './AlbumService';
 import ArtistService from './ArtistService';
 import SongListService from './SongListService';
+import NeteaseApi from "../model/NeteaseApi";
+import CacheService from "./CacheService";
+import "url-search-params-polyfill"
+import URL from '../utils/url';
 
 export default class YueService {
     private songService: SongService;
@@ -30,5 +34,22 @@ export default class YueService {
 
     getSongListService(): SongListService {
         return this.songListService;
+    }
+
+    public async getSongListByUrl(_url: string) {
+        try {
+            let url = new URL(_url);
+            if ((url.host === 'music.163.com'||url.host === 'y.music.163.com') && (url.pathname === '/playlist'||url.pathname === '/m/playlist')) {
+
+                let id: string = new URLSearchParams(url.search).get('id') as string;
+                let result = await NeteaseApi.getSongList(id);
+                this.songListService.addSongList(result);
+                CacheService.set('songList', result.toJson());
+            }
+        } catch (e) {
+            console.log(e)
+            console.log('请输入正确的网址,如https://xxx.com/playlist?id=2854089226')
+        }
+
     }
 }

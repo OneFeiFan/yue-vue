@@ -19,7 +19,7 @@ export default class SongList {
     }
 
     // Setter for _id
-    public setId(value: string) {
+    public setId(value: string): void {
         this._id = value;
     }
 
@@ -29,7 +29,7 @@ export default class SongList {
     }
 
     // Setter for _name
-    public setName(name: string) {
+    public setName(name: string): void {
         this._name = name;
     }
 
@@ -39,7 +39,7 @@ export default class SongList {
     }
 
     // Setter for _cover
-    public setCover(cover: string) {
+    public setCover(cover: string): void {
         this._cover = cover;
     }
 
@@ -49,7 +49,7 @@ export default class SongList {
     }
 
     // Setter for _description
-    public setDescription(description: string) {
+    public setDescription(description: string): void {
         this._description = description;
     }
 
@@ -59,18 +59,37 @@ export default class SongList {
     }
 
     // Setter for _songsId
-    public setSongsId(ids: Array<string>) {
+    public setSongsId(ids: Array<string>): void {
         this._songsId = ids;
     }
 
-    public addSongId(id: string) {
+    public addSongId(id: string): void {
         this._songsId.push(id);
     }
 
-    public removeSongId(id: string) {
+    public getAllSongs(): Array<any> {
+        return this._songsId.map(id => {
+            return { id: id };
+        });
+    }
+
+    public getSize(): number {
+        return this._songsId.length;
+    }
+
+    public removeSongId(id: string): void {
         const index = this._songsId.indexOf(id);
         if (index > -1) {
             this._songsId.splice(index, 1);
         }
+    }
+
+    public toJson():string {
+        return JSON.stringify(this);
+    }
+
+    public static fromJson(jsonData: string): SongList {
+        const decodedData = JSON.parse(jsonData) as { _id: string, _name: string, _cover: string, _description: string, _songsId: Array<string>};
+        return new SongList(decodedData._id, decodedData._name, decodedData._cover, decodedData._description, decodedData._songsId);
     }
 }
