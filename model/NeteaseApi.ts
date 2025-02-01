@@ -36,7 +36,7 @@ export default class NeteaseApi {
             if (res.status === 200) {
                 const {id, name, coverImgUrl, description} = res.body.playlist as NCMSongList;
                 return {
-                    "id": "NCM" + id,
+                    "id": "NCM:" + id,
                     "name": "网易云：" + name,
                     "cover": coverImgUrl,
                     "description": description || "",
@@ -57,7 +57,7 @@ export default class NeteaseApi {
                 throw new Error("Failed to get song list songs");
             }
             const songPrivileges: NCMSongPrivileges = res.body.privileges as NCMSongPrivileges;
-            return songPrivileges.map(song => song.id);
+            return songPrivileges.map(song => "NCM:" + song.id);
         } catch (err) {
             throw err
         }
@@ -91,9 +91,9 @@ export default class NeteaseApi {
             const songsArray: Array<Song> = songs.map(song => {
                 const {id, name, ar, al, dt, publishTime} = song;
                 const artistIds = ar.map(item => "NCM" + item.id);
-                const albumId = "NCM" + al.id;
+                const albumId = "NCM:" + al.id;
                 return new Song(
-                    "NCM" + id,
+                    "NCM:" + id,
                     name,
                     artistIds,
                     albumId,
@@ -116,21 +116,17 @@ export default class NeteaseApi {
         //#ifdef H5
         const answer = {status: 500, body: {}, cookie: []}
         res = await new Promise((resolve, reject) => {
-            // @ts-ignore
             uni.request({
                 url: `http://localhost:3000/song/download/url?id=${id}`,
                 method: 'GET',
                 responseType: 'arraybuffer',
-                // @ts-ignore
                 success: function (result) {
-                    const body = result.data
+                    const body = result.data as ArrayBuffer;
                     answer.status = result.statusCode;
                     const utf8decoder = new TextDecoder("utf-8");
-                    // @ts-ignore
                     answer.body = JSON.parse(utf8decoder.decode(body));
                     resolve(answer);
                 },
-                // @ts-ignore
                 fail: function (res) {
                     reject(res);
                 }
@@ -141,7 +137,6 @@ export default class NeteaseApi {
         res = await NCM.song_download_url({id});
         //#endif
         try {
-            // @ts-ignore
             if (res.status !== 200) {
                 throw new Error("Failed to get song URL.");
             }
