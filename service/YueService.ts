@@ -44,7 +44,11 @@ export default class YueService {
                 let id: string = new URLSearchParams(url.search).get('id') as string;
                 let result = await NeteaseApi.getSongList(id);
                 this.songListService.addSongList(result);
-                // CacheService.set('songList', result.toJson());
+                let songsId_raw = result.getAllSongs();
+                let songsId = songsId_raw.map(id => {
+                    return id.split(":")[1];
+                });
+                this.getSongById(songsId);
             }
         } catch (e) {
             console.log(e)
@@ -52,4 +56,33 @@ export default class YueService {
         }
 
     }
+
+    public async getSongById(ids: Array<string>) {
+        let missingIds: Array<string> = [];
+
+        // 检查每个ID是否存在于songService中
+        for (let id of ids) {
+            if (!this.songService.hasSong(id)) {
+                missingIds.push(id);
+            }
+        }
+
+        // 从NeteaseApi获取不在缓存中的歌曲
+        let missingSongs = await NeteaseApi.getSong(missingIds);
+
+        // 将获取到的歌曲添加到songService
+        for (let song of missingSongs) {
+            this.songService.addSong(song);
+        }
+
+        // // 可选：如果需要获取所有歌曲（包括已存在的和新获取的）
+        // let allSongs = await NeteaseApi.getSong(ids);
+        // for (let song of allSongs) {
+        //     this.songService.addSong(song);
+        // }
+
+        // console.log(songs)
+    }
+
+
 }
