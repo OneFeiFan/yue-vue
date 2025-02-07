@@ -5,7 +5,9 @@
     "description": "",
     "keywords": [],
     "dependencies": {
+        "image-js": "github:OneFeiFan/image-js",
         "NeteaseCloudMusicApi": "github:OneFeiFan/NeteaseCloudMusicApi",
+        "text-decoding": "^1.0.0",
         "url-search-params-polyfill": "^8.2.5"
     },
     "devDependencies": {
