@@ -9,8 +9,12 @@
     "esModuleInterop": true,       // 确保与模块系统的兼容性
     "skipLibCheck": true,          // 跳过库文件的类型检查
     "forceConsistentCasingInFileNames": true,  // 确保文件名大小写一致
-    "moduleResolution": "nodenext", // 使用 Node.js 风格的模块解析策略
-    "outDir": "./unpackage/dist"
+//    "moduleResolution": "nodenext", // 使用 Node.js 风格的模块解析策略
+    "outDir": "./unpackage/dist",
+    "types": [
+      "@uni-helper/uni-app-types",
+      "@dcloudio/types"
+    ]
   },
   "include": [
     "model/*.ts",                     // 包括需要检查的文件
