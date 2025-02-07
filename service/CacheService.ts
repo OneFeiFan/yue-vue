@@ -12,7 +12,7 @@ export default class CacheService {
         if (CacheService.cache.size >= CacheService.maxCacheSize) {
             CacheService.removeUsingClock();
         }
-        console.log(`Cache set, key: ${key}, value: ${value}, size: ${CacheService.cache.size}`);
+        // console.log(`Cache set, key: ${key}, value: ${value}, size: ${CacheService.cache.size}`);
         // 首先写入cache
         CacheService.cache.set(key, value);
 
@@ -62,11 +62,11 @@ export default class CacheService {
         while (CacheService.pendingCache.size > 0) {
             const key = CacheService.pendingCache.values().next().value as string;
             CacheService.pendingCache.delete(key);
-            console.log(`Flushing cache for key: ${key}`);
+            // console.log(`Flushing cache for key: ${key}`);
             try {
                 // 从cache中获取最新数据
                 let newData = CacheService.cache.get(key) || {};
-                console.log(`Flushing cache for key: ${key}, newData: ${newData}`);
+                // console.log(`Flushing cache for key: ${key}, newData: ${newData}`);
                 if (newData === "-1-1-1") {
                     // 如果新数据是"-1-1-1"，则删除本地存储中的该项
                     uni.removeStorageSync(key);
@@ -77,7 +77,7 @@ export default class CacheService {
                     // let mergedData = { ...existingData, ...newData };
                     // 将合并后的数据写入本地存储
                     uni.setStorageSync(key, newData);
-                    console.log(uni.getStorageSync(key))
+                    // console.log(uni.getStorageSync(key))
                 }
             } catch (e) {
                 console.error(`Failed to flush cache for key: ${key}`, e);
