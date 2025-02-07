@@ -137,6 +137,7 @@ export default class NeteaseApi {
         res = await NCM.song_download_url({id});
         //#endif
         try {
+            // @ts-ignore
             if (res.status !== 200) {
                 throw new Error("Failed to get song URL.");
             }
