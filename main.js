@@ -1,5 +1,7 @@
 import App from './App'
-
+import { TextEncoder, TextDecoder } from 'text-decoding'
+global.TextEncoder = TextEncoder
+global.TextDecoder = TextDecoder
 // #ifndef VUE3
 import Vue from 'vue'
 import './uni.promisify.adaptor'
