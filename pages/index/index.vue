@@ -25,7 +25,7 @@
         <view class="song-list content-wrap" v-show="tab.title ==='歌单'">
           <scroll-view :scroll-top="scrollTop" scroll-y="true" class="song-list-scroll" @scrolltoupper="upper"
                        @scrolltolower="lower" @scroll="scroll">
-            <view class="list-item" v-for="[key, _songlist] in songList" :key="key">
+            <view class="list-item" v-for="[key, _songlist] in songList" :key="key" @click="clickSongList(key)">
               <image class="list-icon" :src="_songlist.getCover()" mode="aspectFill"></image>
               <view class="text-content">
                 <view class="list-name">
@@ -65,13 +65,14 @@ import StatusBar from "@/components/status-bar/status-bar.vue";
 import UniNavBar from "@/uni_modules/uni-nav-bar/components/uni-nav-bar/uni-nav-bar.vue";
 import SongList from "@/model/SongList";
 import UniIcons from "@/uni_modules/uni-icons/components/uni-icons/uni-icons.vue";
-
+import {Image} from "image-js";
 
 export default {
   components: {UniIcons, UniNavBar, StatusBar, YTabs},
   data() {
     return {
-      title: 'Hello',
+      saturation: 4.3,
+      brightness: 0.6,
       searchValue: '',
       showMenu: false,
       activeIndex: 0,
@@ -87,7 +88,8 @@ export default {
     // this.$yueService.getSongListByUrl("https://music.163.com/playlist?id=2854089226&uct2=U2FsdGVkX18ld4Rc3IO/DVyoxwj5X0E/0FsVh7scZe0=")
     const songListService = this.$yueService.getSongListService();
     this.songList = songListService.getAllSongList();
-    console.log(this.songList);
+  },
+  onReady() {
   },
   // onShow() {
   //   const songListService = this.$yueService.getSongListService();
@@ -98,6 +100,61 @@ export default {
     console.log('onHide');
   },
   methods: {
+    clickSongList(id) {
+      console.log(id.split(":"));
+      const songList = this.$yueService.getSongListService().getSongList(id);
+
+        this.open(songList.getCover()).then((color) => {
+          console.log(color);
+          uni.navigateTo({
+            url: `/pages/songList/songList?id=${id}&color=${color}`
+          });
+        });
+
+    },
+    async open(url) {
+      try {
+        // 异步加载图片
+        // let start = Date.now()
+        const image = await Image.load(url);
+        // console.log('图片加载耗时', Date.now() - start);
+        // 异步获取唯一颜色
+        return this.getUniqueColor(image.data);
+      } catch (error) {
+        console.error('图片处理失败', error);
+      }
+    },
+    getUniqueColor(imageData) {
+      let sum_r = 0, sum_g = 0, sum_b = 0;
+      let pixelCount = imageData.length / 4;
+
+      for (let i = 0; i < imageData.length; i += 4) {
+        sum_r += imageData[i];
+        sum_g += imageData[i + 1];
+        sum_b += imageData[i + 2];
+      }
+
+      let res_r = Math.round(sum_r / pixelCount);
+      let res_g = Math.round(sum_g / pixelCount);
+      let res_b = Math.round(sum_b / pixelCount);
+
+      // 饱和度调整
+      let max = Math.max(res_r, res_g, res_b);
+      let min = Math.min(res_r, res_g, res_b);
+      let delta = (max - min) / 255;
+      let saturationFactor = 1 + (this.saturation - 1) * delta;
+
+      res_r = Math.min(255, Math.max(0, Math.round(res_r + (res_r - 128) * saturationFactor)));
+      res_g = Math.min(255, Math.max(0, Math.round(res_g + (res_g - 128) * saturationFactor)));
+      res_b = Math.min(255, Math.max(0, Math.round(res_b + (res_b - 128) * saturationFactor)));
+
+      // 亮度调整
+      res_r = Math.min(255, Math.max(0, Math.round(res_r * this.brightness)));
+      res_g = Math.min(255, Math.max(0, Math.round(res_g * this.brightness)));
+      res_b = Math.min(255, Math.max(0, Math.round(res_b * this.brightness)));
+
+      return `rgba(${res_r}, ${res_g}, ${res_b}, ${0.25})`;
+    },
     clearInput() {
       this.searchValue = '';
     },
@@ -122,12 +179,12 @@ export default {
       console.log(e)
       this.old.scrollTop = e.detail.scrollTop
     },
-    addSongList(){
+    addSongList() {
       uni.showModal({
         title: '提示',
         content: '',
-        editable:true,
-        success: (res)=> {
+        editable: true,
+        success: (res) => {
           if (res.confirm) {
             //https://music.163.com/playlist?id=2854089226&uct2=U2FsdGVkX1+mh9YDffLH+/Os8HjCfKfKZI2rBT9RXqA=
 
@@ -145,7 +202,7 @@ export default {
               uni.showToast({
                 title: '加载失败',
                 icon: 'none'
-                });
+              });
             });
             console.log('用户点击确定');
           } else if (res.cancel) {
@@ -259,56 +316,44 @@ $nav-height: 30px;
   &-scroll {
     flex: 1;
   }
-  .list-item{
+
+  .list-item {
     height: 150rpx;
     //background-color: #4cd964;
     display: flex;
     flex-direction: row;
     align-items: center;
     transition: background-color 0.5s ease;
-    &:active{
+
+    &:active {
       background-color: #f0f0f0;
     }
-    .list-icon{
+
+    .list-icon {
       height: 125rpx;
       width: 125rpx;
       border-radius: 50%;
       margin-right: 20rpx;
       margin-left: 20rpx;
     }
-    .text-content{
+
+    .text-content {
       height: 100%;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      .list-name{
+
+      .list-name {
 
       }
-      .list-desc{
+
+      .list-desc {
         margin-top: 10rpx;
         font-size: 20rpx;
         color: grey;
         line-height: 20rpx;
       }
     }
-  }
-  .scroll-view_H {
-    white-space: nowrap;
-    width: 100%;
-  }
-  .scroll-view-item {
-    height: 300rpx;
-    line-height: 300rpx;
-    text-align: center;
-    font-size: 36rpx;
-  }
-  .scroll-view-item_H {
-    display: inline-block;
-    width: 100%;
-    height: 300rpx;
-    line-height: 300rpx;
-    text-align: center;
-    font-size: 36rpx;
   }
 }
 
