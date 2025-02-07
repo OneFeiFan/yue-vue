@@ -1,6 +1,6 @@
 export default class Song {
     private _id: string;
-    private _title: string;
+    private _name: string;
     private _artistId: Array<string|number>;
     private _albumId: string; // 专辑
     private _genre: string; // 流派
@@ -10,9 +10,9 @@ export default class Song {
     private _cover: string;
     private _lyrics: string; // 歌词
 
-    constructor(id: string, title: string, artistId: Array<string>, albumId: string, genre: string, year: number, duration: number, url: string, cover: string, lyrics: string) {
+    constructor(id: string, name: string, artistId: Array<string>, albumId: string, genre: string, year: number, duration: number, url: string, cover: string, lyrics: string) {
         this._id = id;
-        this._title = title;
+        this._name = name;
         this._artistId = artistId;
         this._albumId = albumId;
         this._genre = genre;
@@ -32,13 +32,13 @@ export default class Song {
         this._id = id;
     }
 
-    // Getter and Setter for _title
-    public getTitle(): string {
-        return this._title;
+    // Getter and Setter for _name
+    public getName(): string {
+        return this._name;
     }
 
-    public setTitle(title: string): void {
-        this._title = title;
+    public setName(name: string): void {
+        this._name = name;
     }
 
     // Getter and Setter for _artistId
@@ -111,5 +111,13 @@ export default class Song {
 
     public setLyrics(lyrics: string): void {
         this._lyrics = lyrics;
+    }
+    public toJson():string {
+        console.log("Song.toJson()");
+        return JSON.stringify(this);
+    }
+    public static fromJson(jsonData: string): Song {
+        const decodedData = JSON.parse(jsonData) as { _id: string, _name: string, _artistId: Array<string>, _albumId: string, _genre: string, _year: number, _duration: number, _url: string, _cover: string, _lyrics: string };
+        return new Song(decodedData._id, decodedData._name, decodedData._artistId, decodedData._albumId, decodedData._genre, decodedData._year, decodedData._duration, decodedData._url, decodedData._cover, decodedData._lyrics);
     }
 }

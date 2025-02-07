@@ -67,10 +67,8 @@ export default class SongList {
         this._songsId.push(id);
     }
 
-    public getAllSongs(): Array<any> {
-        return this._songsId.map(id => {
-            return { id: id };
-        });
+    public getAllSongs(): Array<string> {
+        return this._songsId;
     }
 
     public getSize(): number {
@@ -85,6 +83,7 @@ export default class SongList {
     }
 
     public toJson():string {
+        console.log("SongList.toJson()");
         return JSON.stringify(this);
     }
 
